@@ -2,11 +2,12 @@
 using LeaveTracking.Domain.DTO;
 using LeaveTracking.Domain.Entities;
 using LeaveTracking.Domain.IRepository;
-using LeaveTracking.Infrastructure.utility;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
+using LeaveTracking.Utility;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -97,19 +98,33 @@ namespace LeaveTracking.Infrastructure.Repository
 		{
 			try
 			{
-				var userexists = await _context.UserTbls.FirstOrDefaultAsync(x => x.UserName.ToLower() == userTbl.UserName.ToLower() || x.Email.ToLower()==userTbl.Email.ToLower());
+				//var userexists = await _context.UserTbls.FirstOrDefaultAsync(x => x.UserName.ToLower() == userTbl.UserName.ToLower() || x.Email.ToLower()==userTbl.Email.ToLower());
 
-				if (userexists != null) 
+				//if (userexists != null) 
+				//{
+				//	return false;
+				//}
+				//userTbl.Password = PasswordEncrypt.HashPassword(userTbl.Password);
+				//userTbl.Role = userTbl.Role;
+				//userTbl.Token = "";
+				//userTbl.DeptId = userTbl.DeptId;
+				//await _context.AddAsync(userTbl);
+				//await _context.SaveChangesAsync();
+				//return true;
+
+				var parameters = new[]
 				{
-					return false;
-				}
-				userTbl.Password = PasswordEncrypt.HashPassword(userTbl.Password);
-				userTbl.Role = userTbl.Role;
-				userTbl.Token = "";
-				userTbl.DeptId = userTbl.DeptId;
-				await _context.AddAsync(userTbl);
-				await _context.SaveChangesAsync();
-				return true;
+					new SqlParameter("@UserName",SqlDbType.NVarChar){Value=userTbl.UserName},
+					new SqlParameter("@FirstName", SqlDbType.NVarChar) { Value = userTbl.FirstName },
+					new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = userTbl.LastName },
+					new SqlParameter("@Email", SqlDbType.NVarChar) { Value = userTbl.Email },
+					new SqlParameter("@Password", SqlDbType.NVarChar) { Value = userTbl.Password },  
+					new SqlParameter("@Role", SqlDbType.NVarChar) { Value = userTbl.Role },
+					new SqlParameter("@DeptId", SqlDbType.Int) { Value = userTbl.DeptId },
+					new SqlParameter("@Manager_id", SqlDbType.Int) { Value = userTbl.ManagerId }
+				};
+				var result = await _context.Database.ExecuteSqlRawAsync("EXEC SP_register_new_user @UserName, @FirstName, @LastName, @Email, @Password, @Role, @DeptId, @Manager_id", parameters);
+				return result > 0;
 			}
 			catch (Exception)
 			{
@@ -174,6 +189,22 @@ namespace LeaveTracking.Infrastructure.Repository
 				return principal;
 			}
 			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task<List<ManagerListDTO>> ManagerList()
+		{
+			try
+			{
+				return await _context.UserTbls.Where(u=>u.Role== "Manager").Select(u=> new ManagerListDTO
+				{
+					managerid = u.UserId,
+					name = u.FirstName+" "+u.LastName
+				}).ToListAsync();
+			}
+			catch(Exception) 
 			{
 				throw;
 			}

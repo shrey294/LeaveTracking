@@ -2,6 +2,7 @@
 using LeaveTracking.Domain.DTO;
 using LeaveTracking.Domain.Entities;
 using LeaveTracking.Domain.IRepository;
+using LeaveTracking.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,15 +22,19 @@ namespace LeaveTracking.Application.Service
 			var entity = new UserTbl
 			{
 				Email = user.Email,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
 				UserName = user.UserName,
-				Password = user.Password,
+				Password = PasswordEncrypt.HashPassword(user.Password),
 				Role = user.Role,
-				DeptId = user.dept_id
+				DeptId = user.deptid,
+				ManagerId = user.managerid
 			};
 			return await _userrepo.RegisterUser(entity);
 		}
 		public async Task<AuthResponseDTO> Authenticate(UserDTO user)
 		{
+
 			var entity = new UserTbl
 			{
 				UserName = user.UserName,
@@ -46,6 +51,10 @@ namespace LeaveTracking.Application.Service
 				RefreshToken = tokenApi.RefreshToken
 			};
 			return await _userrepo.refresh(DTOMapping);
+		}
+		public async Task<List<LeaveTracking.Domain.DTO.ManagerListDTO>> ManagerList()
+		{
+			return await _userrepo.ManagerList();
 		}
 	}
 }

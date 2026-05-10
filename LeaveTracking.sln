@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveTracking.Application",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveTracking.Infrastructure", "LeaveTracking.Infrastructure\LeaveTracking.Infrastructure.csproj", "{E0269244-9186-4CD9-A592-95A16E02320F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveTracking.Utility", "LeaveTracking.Utility\LeaveTracking.Utility.csproj", "{81DCF5C1-F9A2-4364-A1E0-54388E2B7BD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E0269244-9186-4CD9-A592-95A16E02320F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0269244-9186-4CD9-A592-95A16E02320F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0269244-9186-4CD9-A592-95A16E02320F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DCF5C1-F9A2-4364-A1E0-54388E2B7BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DCF5C1-F9A2-4364-A1E0-54388E2B7BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DCF5C1-F9A2-4364-A1E0-54388E2B7BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DCF5C1-F9A2-4364-A1E0-54388E2B7BD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

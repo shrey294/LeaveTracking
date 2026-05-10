@@ -32,9 +32,9 @@ namespace LeaveTracking.Controllers
 					return BadRequest(new { success = false, message = "user with this creditails exists" });
 				}
 			}
-			catch (Exception) 
+			catch (Exception ex) 
 			{
-				return BadRequest(new { success = false, message = "Something Went Wrong" });
+				return BadRequest(new { success = false, message = ex.Message });
 			}
 		}
 		[HttpPost("Authenticate")]
@@ -71,6 +71,19 @@ namespace LeaveTracking.Controllers
 				{
 					return BadRequest(new { success = false, message = result.message });
 				}
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[HttpGet("ManagerList")]
+		public async Task<IActionResult> ManagerList()
+		{
+			try
+			{
+				var ManagerList = await _userService.ManagerList();
+				return Ok(new { result = ManagerList });
 			}
 			catch (Exception)
 			{

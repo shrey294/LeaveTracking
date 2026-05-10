@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
-namespace LeaveTracking.Infrastructure.utility
+namespace LeaveTracking.Utility
 {
 	public class PasswordEncrypt
 	{

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LeaveTracking.Domain\LeaveTracking.Domain.csproj" />
+    <ProjectReference Include="..\LeaveTracking.Utility\LeaveTracking.Utility.csproj" />
   </ItemGroup>
 
 </Project>

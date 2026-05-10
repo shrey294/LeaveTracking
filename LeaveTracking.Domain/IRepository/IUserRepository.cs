@@ -13,5 +13,6 @@ namespace LeaveTracking.Domain.IRepository
 		Task<bool> RegisterUser(UserTbl userTbl);
 		Task<AuthResponseDTO> Authenticate(UserTbl user);
 		Task<AuthResponseDTO> refresh(TokenApiDto token);
+		Task<List<ManagerListDTO>> ManagerList();
 	}
 }

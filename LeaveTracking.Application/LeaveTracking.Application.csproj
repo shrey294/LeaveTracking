@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LeaveTracking.Infrastructure\LeaveTracking.Infrastructure.csproj" />
+    <ProjectReference Include="..\LeaveTracking.Utility\LeaveTracking.Utility.csproj" />
   </ItemGroup>
 
 </Project>
