@@ -22,11 +22,14 @@ public partial class LeaveTrackingDbContext : DbContext
 
     public virtual DbSet<LeaveType> LeaveTypes { get; set; }
 
+    public virtual DbSet<MenuTbl> MenuTbls { get; set; }
+
+    public virtual DbSet<RoleFormPermission> RoleFormPermissions { get; set; }
+
     public virtual DbSet<UserTbl> UserTbls { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-L48UG33\\SQLEXPRESS; Database=LeaveTracking;Trusted_Connection=True;TrustServerCertificate=True;");
+    { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,6 +84,40 @@ public partial class LeaveTrackingDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("Leave_name");
+        });
+
+        modelBuilder.Entity<MenuTbl>(entity =>
+        {
+            entity.HasKey(e => e.MenuId);
+
+            entity.ToTable("Menu_tbl");
+
+            entity.Property(e => e.MenuId).HasColumnName("menu_id");
+            entity.Property(e => e.Icon)
+                .HasMaxLength(100)
+                .HasColumnName("icon");
+            entity.Property(e => e.Label)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("label");
+            entity.Property(e => e.MenuOrder).HasColumnName("menu_order");
+            entity.Property(e => e.Route)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("route");
+        });
+
+        modelBuilder.Entity<RoleFormPermission>(entity =>
+        {
+            entity.HasKey(e => e.PermissionId);
+
+            entity.ToTable("Role_Form_Permission");
+
+            entity.Property(e => e.PermissionId).HasColumnName("permission_id");
+            entity.Property(e => e.MenuId).HasColumnName("menu_id");
+            entity.Property(e => e.Role)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<UserTbl>(entity =>

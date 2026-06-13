@@ -56,5 +56,33 @@ namespace LeaveTracking.Application.Service
 		{
 			return await _userrepo.ManagerList();
 		}
+		public async Task<LeaveAssignmentResponse> Leave_assignment(LeaveBalanceDTO leaveBalance)
+		{
+			var mapping = new LeaveBalance
+			{
+				DeptId = leaveBalance.DeptId,
+				LeaveTypeId = leaveBalance.LeaveTypeId,
+				TotalLeaves = leaveBalance.TotalLeaves,
+				UsedLeaves = 0,
+				RemainingLeaves = leaveBalance.TotalLeaves
+			};
+
+			return await _userrepo.Leave_assignment(mapping);
+		}
+		public async Task<List<DeptLeaveAssignment>> GetDeptLeaveAssignments()
+		{
+			return await _userrepo.GetDeptLeaveAssignments();
+		}
+		public async Task<LeaveAssignmentResponse> Update_LeaveAssignment(LeaveBalanceDTO leaveBalance)
+		{
+			var mapping = new LeaveBalance
+			{
+				DeptId = leaveBalance.DeptId,
+				LeaveTypeId = leaveBalance.LeaveTypeId,
+				TotalLeaves = leaveBalance.TotalLeaves,
+				RemainingLeaves = leaveBalance.TotalLeaves
+			};
+			return await _userrepo.Update_LeaveAssignment(mapping);
+		}
 	}
 }

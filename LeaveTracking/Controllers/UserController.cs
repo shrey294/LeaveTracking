@@ -45,7 +45,7 @@ namespace LeaveTracking.Controllers
 				var result = await _userService.Authenticate(user);
 				if (result.success)
 				{
-					return Ok(new { result.AccessToken, result.RefreshToken });
+					return Ok(new { result.AccessToken, result.RefreshToken,Permission=result.Permissions });
 				}
 				else
 				{
@@ -84,6 +84,59 @@ namespace LeaveTracking.Controllers
 			{
 				var ManagerList = await _userService.ManagerList();
 				return Ok(new { result = ManagerList });
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[HttpPost("LeaveAssignment")]
+		public async Task<IActionResult> Leave_assignment(LeaveBalanceDTO leaveBalance)
+		{
+			try
+			{
+				var result = await _userService.Leave_assignment(leaveBalance);
+				if (result.Success)
+				{
+					return Ok(new { success = result.Success, message = result.Message });
+				}
+				else
+				{
+					return Ok(new { success = result.Success, message = result.Message });
+				}
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[HttpGet("GetDeptLeaveAssignments")]
+		public async Task<IActionResult> GetDeptLeaveAssignments()
+		{
+			try
+			{
+				var result = await _userService.GetDeptLeaveAssignments();
+				return Ok(result);
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[HttpPost("updateLeave")]
+		public async Task<IActionResult> Update_LeaveAssignment(LeaveBalanceDTO leaveBalance)
+		{
+			try
+			{
+				var result = await _userService.Update_LeaveAssignment(leaveBalance);
+				if (result.Success)
+				{
+					return Ok(new { success = result.Success, message = result.Message });
+				}
+				else
+				{
+					return Ok(new { success = result.Success, message = result.Message });
+				}
 			}
 			catch (Exception)
 			{

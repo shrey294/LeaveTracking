@@ -46,17 +46,26 @@ namespace LeaveTracking.Infrastructure.Repository
 						message = "UserName Or Password is incorrect"
 					};
 				}
+				
 				User.Token = CreateJwtToken(User);
 				var newAccessToken = User.Token;
 				var RefreshToken = CreaterefreshToken();
 				User.RefreshToken = RefreshToken;
 				User.ExpiryTime = DateTime.UtcNow.AddDays(1);
+				var permissions = await (
+			from p in _context.RoleFormPermissions
+			join m in _context.MenuTbls
+				on p.MenuId equals m.MenuId
+			where p.Role == User.Role
+			select m.Route
+		).ToListAsync();
 				await _context.SaveChangesAsync();
 				return new AuthResponseDTO
 				{
 					success = true,
 					AccessToken = newAccessToken,
-					RefreshToken = RefreshToken
+					RefreshToken = RefreshToken,
+					Permissions = permissions
 				};
 			}
 			catch (Exception)
@@ -205,6 +214,123 @@ namespace LeaveTracking.Infrastructure.Repository
 				}).ToListAsync();
 			}
 			catch(Exception) 
+			{
+				throw;
+			}
+		}
+		public async Task<LeaveAssignmentResponse> Leave_assignment(LeaveBalance leaveBalance)
+		{
+			try
+			{
+				await using var conn = _context.Database.GetDbConnection();
+				if (conn.State != ConnectionState.Open)
+					await conn.OpenAsync();
+
+				await using var cmd = conn.CreateCommand();
+				cmd.CommandText = "dbo.sp_InsertLeaveBalancesByDept";
+				cmd.CommandType = CommandType.StoredProcedure;
+				cmd.Parameters.Add(new SqlParameter("@Dept_id", leaveBalance.DeptId));
+				cmd.Parameters.Add(new SqlParameter("@leave_type_id", leaveBalance.LeaveTypeId));
+				cmd.Parameters.Add(new SqlParameter("@total_leaves", leaveBalance.TotalLeaves));
+				cmd.Parameters.Add(new SqlParameter("@used_leaves", leaveBalance.UsedLeaves));
+				cmd.Parameters.Add(new SqlParameter("@remaining_leaves", leaveBalance.RemainingLeaves));
+
+				await using var reader = await cmd.ExecuteReaderAsync();
+
+				if (!await reader.ReadAsync())
+				{
+					return new LeaveAssignmentResponse
+					{
+						Success = false,
+						Message = "No response received from database."
+					};
+				}
+
+				int result = Convert.ToInt32(reader["Result"]);
+				string message = reader["Message"]?.ToString() ?? "";
+
+				return new LeaveAssignmentResponse
+				{
+					Success = result == 1,
+					Message = message
+				};
+			}
+			catch (Exception ex)
+			{
+				return new LeaveAssignmentResponse
+				{
+					Success = false,
+					Message = ex.Message
+				};
+			}
+		}
+		public async Task<List<DeptLeaveAssignment>> GetDeptLeaveAssignments()
+		{
+			var list = new List<DeptLeaveAssignment>();
+			try
+			{
+				await using var conn = _context.Database.GetDbConnection();
+				if (conn.State != ConnectionState.Open)
+					await conn.OpenAsync();
+
+				await using var cmd = conn.CreateCommand();
+				cmd.CommandText = "dbo.sp_GetDeptLeaveAssignments";
+				cmd.CommandType = CommandType.StoredProcedure;
+
+				await using var reader = await cmd.ExecuteReaderAsync();
+				while (await reader.ReadAsync())
+				{
+					list.Add(new DeptLeaveAssignment
+					{
+						DeptId = Convert.ToInt32(reader["Dept_id"]),
+						DeptName = reader["department_name"]?.ToString() ?? "",
+						LeaveTypeId = Convert.ToInt32(reader["leave_id"]),
+						LeaveTypeName = reader["Leave_name"]?.ToString() ?? "",
+						TotalLeaves = Convert.ToInt32(reader["total_leaves"])
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+			return list;
+		}
+
+		public async Task<LeaveAssignmentResponse> Update_LeaveAssignment(LeaveBalance leaveBalance)
+		{
+			try
+			{
+				await using var conn = _context.Database.GetDbConnection();
+				if (conn.State != ConnectionState.Open)
+					await conn.OpenAsync();
+				
+				await using var cmd = conn.CreateCommand();
+				cmd.CommandText = "dbo.sp_UpdateLeaveBalancesByDept";
+				cmd.CommandType = CommandType.StoredProcedure;
+
+				cmd.Parameters.Add(new SqlParameter("@Dept_id", leaveBalance.DeptId));
+				cmd.Parameters.Add(new SqlParameter("@leave_type_id", leaveBalance.LeaveTypeId));
+				cmd.Parameters.Add(new SqlParameter("@total_leaves", leaveBalance.TotalLeaves));
+				await using var reader = await cmd.ExecuteReaderAsync();
+
+				if(!await reader.ReadAsync())
+				{
+					return new LeaveAssignmentResponse
+					{
+						Success = false,
+						Message = "No Response From Database"
+					};
+				}
+				int result = Convert.ToInt32(reader["Result"]);
+				string message = Convert.ToString(reader["Message"])??"";
+				return new LeaveAssignmentResponse
+				{
+					Success = result == 1,
+					Message = message,
+				};
+			}
+			catch (Exception)
 			{
 				throw;
 			}

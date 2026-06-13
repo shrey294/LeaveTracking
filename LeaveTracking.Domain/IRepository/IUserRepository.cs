@@ -14,5 +14,8 @@ namespace LeaveTracking.Domain.IRepository
 		Task<AuthResponseDTO> Authenticate(UserTbl user);
 		Task<AuthResponseDTO> refresh(TokenApiDto token);
 		Task<List<ManagerListDTO>> ManagerList();
+		Task<LeaveAssignmentResponse> Leave_assignment(LeaveBalance leaveBalance);
+		Task<List<DeptLeaveAssignment>> GetDeptLeaveAssignments();
+		Task<LeaveAssignmentResponse> Update_LeaveAssignment(LeaveBalance leaveBalance);
 	}
 }

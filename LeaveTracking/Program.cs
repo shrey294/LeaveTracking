@@ -25,6 +25,8 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<ILeaveType, LeaveTypeRepository>();
 builder.Services.AddScoped<LeaveTypeService>();
+builder.Services.AddScoped<IMenuRepository,MenuRepository>();
+builder.Services.AddScoped<MenuService>();
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;

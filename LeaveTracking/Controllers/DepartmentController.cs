@@ -8,7 +8,7 @@ namespace LeaveTracking.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "Admin,Manager")]
 	public class DepartmentController : ControllerBase
 	{
 		private readonly DepartmentService _service;

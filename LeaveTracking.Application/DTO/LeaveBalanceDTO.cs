@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace LeaveTracking.Application.DTO
 {
-	public class Leave_BalanceDTO
+	public class LeaveBalanceDTO
 	{
-		public string Leave_type {  get; set; }
-		public int? total_leave {  get; set; }
+		public int? DeptId { get; set; }
+
+		public int? LeaveTypeId { get; set; }
+
+		public int? TotalLeaves { get; set; }
 	}
 }
