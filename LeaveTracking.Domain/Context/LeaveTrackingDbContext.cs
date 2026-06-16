@@ -20,16 +20,21 @@ public partial class LeaveTrackingDbContext : DbContext
 
     public virtual DbSet<LeaveBalance> LeaveBalances { get; set; }
 
+    public virtual DbSet<LeaveHistory> LeaveHistories { get; set; }
+
     public virtual DbSet<LeaveType> LeaveTypes { get; set; }
 
     public virtual DbSet<MenuTbl> MenuTbls { get; set; }
 
     public virtual DbSet<RoleFormPermission> RoleFormPermissions { get; set; }
 
+    public virtual DbSet<RoleTbl> RoleTbls { get; set; }
+
     public virtual DbSet<UserTbl> UserTbls { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    { }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-L48UG33\\SQLEXPRESS; Database=LeaveTracking;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,6 +70,39 @@ public partial class LeaveTrackingDbContext : DbContext
             entity.Property(e => e.RemainingLeaves).HasColumnName("remaining_leaves");
             entity.Property(e => e.TotalLeaves).HasColumnName("total_leaves");
             entity.Property(e => e.UsedLeaves).HasColumnName("used_leaves");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+        });
+
+        modelBuilder.Entity<LeaveHistory>(entity =>
+        {
+            entity.HasKey(e => e.LeaveHistroyId);
+
+            entity.ToTable("Leave_History");
+
+            entity.Property(e => e.LeaveHistroyId).HasColumnName("Leave_histroy_id");
+            entity.Property(e => e.ApprovedBy).HasColumnName("Approved_by");
+            entity.Property(e => e.Date).HasColumnType("datetime");
+            entity.Property(e => e.DeleteDate)
+                .HasColumnType("datetime")
+                .HasColumnName("delete_date");
+            entity.Property(e => e.Duration).HasMaxLength(50);
+            entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("End_date");
+            entity.Property(e => e.InsertDate)
+                .HasColumnType("datetime")
+                .HasColumnName("insert_date");
+            entity.Property(e => e.LeaveTypeId).HasColumnName("leave_type_id");
+            entity.Property(e => e.Reason).IsUnicode(false);
+            entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Start_Date");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("update_date");
             entity.Property(e => e.UserId).HasColumnName("user_id");
         });
 
@@ -115,9 +153,20 @@ public partial class LeaveTrackingDbContext : DbContext
 
             entity.Property(e => e.PermissionId).HasColumnName("permission_id");
             entity.Property(e => e.MenuId).HasColumnName("menu_id");
-            entity.Property(e => e.Role)
+            entity.Property(e => e.RoleId).HasColumnName("Role_id");
+        });
+
+        modelBuilder.Entity<RoleTbl>(entity =>
+        {
+            entity.HasKey(e => e.RoleId);
+
+            entity.ToTable("Role_tbl");
+
+            entity.Property(e => e.RoleId).HasColumnName("Role_id");
+            entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(false)
+                .HasColumnName("Role_Name");
         });
 
         modelBuilder.Entity<UserTbl>(entity =>
@@ -142,9 +191,7 @@ public partial class LeaveTrackingDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("Last_Name");
             entity.Property(e => e.ManagerId).HasColumnName("Manager_id");
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+            entity.Property(e => e.RoleId).HasColumnName("Role_id");
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)
                 .IsUnicode(false);

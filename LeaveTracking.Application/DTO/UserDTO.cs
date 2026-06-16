@@ -13,7 +13,7 @@ namespace LeaveTracking.Application.DTO
 		public string? LastName { get; set; }
 		public string? Email { get; set; }
 		public string? Password { get; set; }
-		public string? Role { get; set; }
+		public int Role_id { get; set; }
 		public int? deptid { get; set; }
 		public int? managerid { get; set; }
 	}

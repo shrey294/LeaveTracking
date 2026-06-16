@@ -25,11 +25,11 @@ namespace LeaveTracking.Application.Service
 		{
 			return await _menuRepository.RoleMenuNameList();
 		}
-		public async Task<bool> AddMenuRoleMapping(int menuid, string role)
+		public async Task<bool> AddMenuRoleMapping(int menuid, int role_id)
 		{
-			return await _menuRepository.AddMenuRoleMapping(menuid, role);
+			return await _menuRepository.AddMenuRoleMapping(menuid, role_id);
 		}
-		public async Task<bool> EditMenuRoleMapping(int permission_id, int menuid, string role)
+		public async Task<bool> EditMenuRoleMapping(int permission_id, int menuid, int role)
 		{
 			return await _menuRepository.EditMenuRoleMapping(permission_id, menuid, role);
 		}

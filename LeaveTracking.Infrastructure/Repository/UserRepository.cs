@@ -46,23 +46,25 @@ namespace LeaveTracking.Infrastructure.Repository
 						message = "UserName Or Password is incorrect"
 					};
 				}
-				
-				User.Token = CreateJwtToken(User);
+				string rolename = await _context.RoleTbls.Where(x=>x.RoleId== User.RoleId).Select(x=>x.RoleName).FirstOrDefaultAsync();
+				User.Token = CreateJwtToken(User, rolename);
 				var newAccessToken = User.Token;
 				var RefreshToken = CreaterefreshToken();
 				User.RefreshToken = RefreshToken;
 				User.ExpiryTime = DateTime.UtcNow.AddDays(1);
+
 				var permissions = await (
 			from p in _context.RoleFormPermissions
 			join m in _context.MenuTbls
 				on p.MenuId equals m.MenuId
-			where p.Role == User.Role
+			where p.RoleId == User.RoleId
 			select m.Route
 		).ToListAsync();
 				await _context.SaveChangesAsync();
 				return new AuthResponseDTO
 				{
 					success = true,
+					
 					AccessToken = newAccessToken,
 					RefreshToken = RefreshToken,
 					Permissions = permissions
@@ -73,13 +75,13 @@ namespace LeaveTracking.Infrastructure.Repository
 				throw;
 			}
 		}
-		private string CreateJwtToken(UserTbl user)
+		private string CreateJwtToken(UserTbl user, string rolename)
 		{
 			var jwtTokenhandler = new JwtSecurityTokenHandler();
 			var key = Encoding.ASCII.GetBytes("LeaveTrackingScereteKeySouth@@##803");
 			var identity = new ClaimsIdentity(new Claim[]
 			{
-				new Claim(ClaimTypes.Role,user.Role),
+				new Claim(ClaimTypes.Role,rolename),
 				new Claim(ClaimTypes.Name,$"{user.UserName}")
 			});
 			var Credentials = new SigningCredentials(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256);
@@ -128,11 +130,11 @@ namespace LeaveTracking.Infrastructure.Repository
 					new SqlParameter("@LastName", SqlDbType.NVarChar) { Value = userTbl.LastName },
 					new SqlParameter("@Email", SqlDbType.NVarChar) { Value = userTbl.Email },
 					new SqlParameter("@Password", SqlDbType.NVarChar) { Value = userTbl.Password },  
-					new SqlParameter("@Role", SqlDbType.NVarChar) { Value = userTbl.Role },
+					new SqlParameter("@Role_id", SqlDbType.NVarChar) { Value = userTbl.RoleId },
 					new SqlParameter("@DeptId", SqlDbType.Int) { Value = userTbl.DeptId },
 					new SqlParameter("@Manager_id", SqlDbType.Int) { Value = userTbl.ManagerId }
 				};
-				var result = await _context.Database.ExecuteSqlRawAsync("EXEC SP_register_new_user @UserName, @FirstName, @LastName, @Email, @Password, @Role, @DeptId, @Manager_id", parameters);
+				var result = await _context.Database.ExecuteSqlRawAsync("EXEC SP_register_new_user @UserName, @FirstName, @LastName, @Email, @Password, @Role_id, @DeptId, @Manager_id", parameters);
 				return result > 0;
 			}
 			catch (Exception)
@@ -141,7 +143,7 @@ namespace LeaveTracking.Infrastructure.Repository
 			}
 		}
 
-		public async Task<AuthResponseDTO> refresh(TokenApiDto token)
+		public async Task<AuthResponseDTO> refresh(TokenApiDto token, string rolename)
 		{
 			try
 			{
@@ -158,7 +160,7 @@ namespace LeaveTracking.Infrastructure.Repository
 						message = "Invalid Request"
 					};
 				}
-				var newAccessToken = CreateJwtToken(user);
+				var newAccessToken = CreateJwtToken(user,rolename);
 				var RefreshToken = CreaterefreshToken();
 				user.RefreshToken = RefreshToken;
 				await _context.SaveChangesAsync();
@@ -207,7 +209,8 @@ namespace LeaveTracking.Infrastructure.Repository
 		{
 			try
 			{
-				return await _context.UserTbls.Where(u=>u.Role== "Manager").Select(u=> new ManagerListDTO
+				int? role_id_manager = await _context.RoleTbls.Where(x => x.RoleName == "Manager").Select(x => x.RoleId).FirstOrDefaultAsync();
+				return await _context.UserTbls.Where(u=>u.RoleId== role_id_manager).Select(u=> new ManagerListDTO
 				{
 					managerid = u.UserId,
 					name = u.FirstName+" "+u.LastName

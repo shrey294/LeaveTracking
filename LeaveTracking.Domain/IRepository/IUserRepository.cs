@@ -12,10 +12,11 @@ namespace LeaveTracking.Domain.IRepository
 	{
 		Task<bool> RegisterUser(UserTbl userTbl);
 		Task<AuthResponseDTO> Authenticate(UserTbl user);
-		Task<AuthResponseDTO> refresh(TokenApiDto token);
+		Task<AuthResponseDTO> refresh(TokenApiDto token, string rolename);
 		Task<List<ManagerListDTO>> ManagerList();
 		Task<LeaveAssignmentResponse> Leave_assignment(LeaveBalance leaveBalance);
 		Task<List<DeptLeaveAssignment>> GetDeptLeaveAssignments();
 		Task<LeaveAssignmentResponse> Update_LeaveAssignment(LeaveBalance leaveBalance);
+		
 	}
 }

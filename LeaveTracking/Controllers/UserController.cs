@@ -43,6 +43,7 @@ namespace LeaveTracking.Controllers
 			try
 			{
 				var result = await _userService.Authenticate(user);
+				
 				if (result.success)
 				{
 					return Ok(new { result.AccessToken, result.RefreshToken,Permission=result.Permissions });

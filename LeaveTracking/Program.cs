@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -27,6 +28,10 @@ builder.Services.AddScoped<ILeaveType, LeaveTypeRepository>();
 builder.Services.AddScoped<LeaveTypeService>();
 builder.Services.AddScoped<IMenuRepository,MenuRepository>();
 builder.Services.AddScoped<MenuService>();
+builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+builder.Services.AddScoped<LeaveRequestService>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;

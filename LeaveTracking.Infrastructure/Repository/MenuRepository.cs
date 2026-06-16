@@ -34,14 +34,14 @@ namespace LeaveTracking.Infrastructure.Repository
 			}
 		}
 
-		public async Task<bool> AddMenuRoleMapping(int menuid, string role)
+		public async Task<bool> AddMenuRoleMapping(int menuid, int role_id)
 		{
 			try
 			{
 				var entity = new RoleFormPermission
 				{
 					MenuId = menuid,
-					Role = role
+					RoleId = role_id
 				};
 				await _context.RoleFormPermissions.AddAsync(entity);
 				await _context.SaveChangesAsync();
@@ -61,10 +61,12 @@ namespace LeaveTracking.Infrastructure.Repository
 				var result = await (from rfp in _context.RoleFormPermissions
 							  join mt in _context.MenuTbls
 								  on rfp.MenuId equals mt.MenuId
+							  join rt in _context.RoleTbls
+							  on rfp.RoleId equals rt.RoleId
 							  select new permissionmenulistDTO
 							  {
 								  permission_id = rfp.PermissionId,
-								  Role = rfp.Role,
+								  Role = rt.RoleName,
 								  Label = mt.Label
 							  })
 			  .ToListAsync();
@@ -96,14 +98,14 @@ namespace LeaveTracking.Infrastructure.Repository
 			}
 		}
 
-		public async Task<bool> EditMenuRoleMapping(int permission_id,int menuid, string role)
+		public async Task<bool> EditMenuRoleMapping(int permission_id,int menuid, int role)
 		{
 			try
 			{
 				var recordtoupdatd = await _context.RoleFormPermissions.FirstOrDefaultAsync(x=>x.PermissionId == permission_id);
 				if (recordtoupdatd != null)
 				{
-					recordtoupdatd.Role = role;
+					recordtoupdatd.RoleId = role;
 					recordtoupdatd.MenuId = menuid;
 					await _context.SaveChangesAsync();
 				}

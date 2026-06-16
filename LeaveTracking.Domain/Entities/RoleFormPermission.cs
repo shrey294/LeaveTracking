@@ -9,5 +9,5 @@ public partial class RoleFormPermission
 
     public int? MenuId { get; set; }
 
-    public string? Role { get; set; }
+    public int? RoleId { get; set; }
 }

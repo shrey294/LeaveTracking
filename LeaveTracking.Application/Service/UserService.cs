@@ -3,9 +3,11 @@ using LeaveTracking.Domain.DTO;
 using LeaveTracking.Domain.Entities;
 using LeaveTracking.Domain.IRepository;
 using LeaveTracking.Utility;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace LeaveTracking.Application.Service
@@ -13,9 +15,11 @@ namespace LeaveTracking.Application.Service
 	public class UserService
 	{
 		private readonly IUserRepository _userrepo;
-		public UserService(IUserRepository userrepo)
+		private readonly IHttpContextAccessor _httpContextAccessor;
+		public UserService(IUserRepository userrepo, IHttpContextAccessor _http)
 		{
 			_userrepo = userrepo;
+			_httpContextAccessor = _http;
 		}
 		public async Task<bool> RegisterUser(UserDTO user)
 		{
@@ -26,7 +30,7 @@ namespace LeaveTracking.Application.Service
 				LastName = user.LastName,
 				UserName = user.UserName,
 				Password = PasswordEncrypt.HashPassword(user.Password),
-				Role = user.Role,
+				RoleId = user.Role_id,
 				DeptId = user.deptid,
 				ManagerId = user.managerid
 			};
@@ -39,7 +43,7 @@ namespace LeaveTracking.Application.Service
 			{
 				UserName = user.UserName,
 				Password = user.Password,
-				Role = user.Role
+				RoleId = user.Role_id
 			};
 			return await _userrepo.Authenticate(entity);
 		}
@@ -50,7 +54,8 @@ namespace LeaveTracking.Application.Service
 				AccessToken = tokenApi.AccessToken,
 				RefreshToken = tokenApi.RefreshToken
 			};
-			return await _userrepo.refresh(DTOMapping);
+			string rolename = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+			return await _userrepo.refresh(DTOMapping, rolename);
 		}
 		public async Task<List<LeaveTracking.Domain.DTO.ManagerListDTO>> ManagerList()
 		{

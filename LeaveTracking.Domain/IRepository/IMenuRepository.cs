@@ -14,8 +14,8 @@ namespace LeaveTracking.Domain.IRepository
 		Task<List<MenuListDTO>> RoleMenuNameList();
 		Task<List<permissionmenulistDTO>> AdminMenuList();
 		Task<bool> DeleteMenuMapping(int id);
-		Task<bool> AddMenuRoleMapping(int menuid, string role);
-		Task<bool> EditMenuRoleMapping(int permission_id, int menuid, string role);
+		Task<bool> AddMenuRoleMapping(int menuid, int role_id);
+		Task<bool> EditMenuRoleMapping(int permission_id, int menuid, int role);
 		Task<bool> AddMenuRole(MenuTbl menuTbl);
 	}
 }

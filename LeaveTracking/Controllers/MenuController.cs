@@ -88,11 +88,11 @@ namespace LeaveTracking.Controllers
 		//}
 		[HttpPost("AddMenuMapping")]
 		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> AddMenuRoleMapping(int menuid, string role)
+		public async Task<IActionResult> AddMenuRoleMapping(int menuid, int role_id)
 		{
 			try
 			{
-				var result = await _menuservice.AddMenuRoleMapping(menuid, role);
+				var result = await _menuservice.AddMenuRoleMapping(menuid, role_id);
 				if (result)
 				{
 					return Ok(new {success=true,message="mapping added successfully"});
@@ -109,7 +109,7 @@ namespace LeaveTracking.Controllers
 		}
 		[HttpPost("EditMenuMapping")]
 		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> EditMenuRoleMapping(int permission_id, int menuid, string role)
+		public async Task<IActionResult> EditMenuRoleMapping(int permission_id, int menuid, int role)
 		{
 			try
 			{
