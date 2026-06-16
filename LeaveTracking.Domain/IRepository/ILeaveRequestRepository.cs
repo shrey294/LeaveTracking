@@ -12,6 +12,7 @@ namespace LeaveTracking.Domain.IRepository
 	{
 		Task<IEnumerable<LeaveRequestDTO>> GetLeaveRequestsAsync();
 		Task<int> GetUserIdByUsernameAsync(string username);
-		Task<bool> AddLeaveRequest(LeaveHistory leaveHistory);
+		Task<bool> AddLeaveRequest(LeaveHistory leaveHistory, int loggedInUserId, string username);
+		Task<int> GetUserIdByUsername(string username);
 	}
 }

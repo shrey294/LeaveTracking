@@ -105,23 +105,10 @@ namespace LeaveTracking.Infrastructure.Repository
 			}
 			return refreshtoken;
 		}
-		public async Task<bool> RegisterUser(UserTbl userTbl)
+		public async Task<bool> RegisterUser(UserTbl userTbl, int loggedInUserId)
 		{
 			try
 			{
-				//var userexists = await _context.UserTbls.FirstOrDefaultAsync(x => x.UserName.ToLower() == userTbl.UserName.ToLower() || x.Email.ToLower()==userTbl.Email.ToLower());
-
-				//if (userexists != null) 
-				//{
-				//	return false;
-				//}
-				//userTbl.Password = PasswordEncrypt.HashPassword(userTbl.Password);
-				//userTbl.Role = userTbl.Role;
-				//userTbl.Token = "";
-				//userTbl.DeptId = userTbl.DeptId;
-				//await _context.AddAsync(userTbl);
-				//await _context.SaveChangesAsync();
-				//return true;
 
 				var parameters = new[]
 				{
@@ -135,6 +122,30 @@ namespace LeaveTracking.Infrastructure.Repository
 					new SqlParameter("@Manager_id", SqlDbType.Int) { Value = userTbl.ManagerId }
 				};
 				var result = await _context.Database.ExecuteSqlRawAsync("EXEC SP_register_new_user @UserName, @FirstName, @LastName, @Email, @Password, @Role_id, @DeptId, @Manager_id", parameters);
+				if (result > 0)
+				{
+					if (userTbl.ManagerId != 0)
+					{
+						
+						int receiver_user_id = await _context.UserTbls.Where(x => x.UserName == userTbl.UserName).Select(x => x.UserId).FirstOrDefaultAsync();
+						string message = $"{userTbl.FirstName} has been assigned to you";
+						
+
+						var entity = new NotificationTbl
+						{
+							SenderUserId = loggedInUserId,
+							RecevierUserId = receiver_user_id,
+							Message = message,
+							NotificationType = "Assignment",
+							IsRead = false,
+							CreatedDate = DateTime.UtcNow
+						};
+						await _context.NotificationTbls.AddAsync(entity);
+						await _context.SaveChangesAsync();
+						return result > 0;
+					}
+					
+				}
 				return result > 0;
 			}
 			catch (Exception)
@@ -332,6 +343,18 @@ namespace LeaveTracking.Infrastructure.Repository
 					Success = result == 1,
 					Message = message,
 				};
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public Task<int> GetUserIdByUsername(string username)
+		{
+			try
+			{
+				return _context.UserTbls.Where(x => x.UserName == username).Select(x => x.UserId).FirstOrDefaultAsync();
 			}
 			catch (Exception)
 			{

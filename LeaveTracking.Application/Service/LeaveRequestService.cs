@@ -2,6 +2,7 @@
 using LeaveTracking.Domain.DTO;
 using LeaveTracking.Domain.Entities;
 using LeaveTracking.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,11 @@ namespace LeaveTracking.Application.Service
 	public class LeaveRequestService
 	{
 		private readonly ILeaveRequestRepository _leaveRequestRepository;
-		public LeaveRequestService(ILeaveRequestRepository leaveRequestRepository)
+		private readonly IHttpContextAccessor _httpContextAccessor;
+		public LeaveRequestService(ILeaveRequestRepository leaveRequestRepository, IHttpContextAccessor httpContextAccessor)
 		{
 			_leaveRequestRepository = leaveRequestRepository;
+			_httpContextAccessor = httpContextAccessor;
 		}
 		public async Task<IEnumerable<LeaveRequestDTO>> GetLeaveRequestsAsync()
 		{
@@ -29,7 +32,9 @@ namespace LeaveTracking.Application.Service
 
 		public async Task<bool> AddLeaveRequest(LeaveHistoryDTO leaveHistory)
 		{
-			
+			string username = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+			int loggedInUserId = await _leaveRequestRepository.GetUserIdByUsername(username);
+
 			var leaveRequest = new LeaveHistory
 			{
 				LeaveTypeId = leaveHistory.LeaveTypeId,
@@ -41,7 +46,7 @@ namespace LeaveTracking.Application.Service
 				Reason = leaveHistory.Reason,
 				InsertDate = DateTime.Now,
 			};
-			return await _leaveRequestRepository.AddLeaveRequest(leaveRequest);
+			return await _leaveRequestRepository.AddLeaveRequest(leaveRequest, loggedInUserId, username);
 		}
 	}
 }

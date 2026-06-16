@@ -23,6 +23,9 @@ namespace LeaveTracking.Application.Service
 		}
 		public async Task<bool> RegisterUser(UserDTO user)
 		{
+			string username = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+			int loggedInUserId = await _userrepo.GetUserIdByUsername(username);
+
 			var entity = new UserTbl
 			{
 				Email = user.Email,
@@ -34,7 +37,7 @@ namespace LeaveTracking.Application.Service
 				DeptId = user.deptid,
 				ManagerId = user.managerid
 			};
-			return await _userrepo.RegisterUser(entity);
+			return await _userrepo.RegisterUser(entity, loggedInUserId);
 		}
 		public async Task<AuthResponseDTO> Authenticate(UserDTO user)
 		{

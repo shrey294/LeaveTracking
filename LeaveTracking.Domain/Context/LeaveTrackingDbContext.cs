@@ -7,10 +7,6 @@ namespace LeaveTracking.Domain.Context;
 
 public partial class LeaveTrackingDbContext : DbContext
 {
-    public LeaveTrackingDbContext()
-    {
-    }
-
     public LeaveTrackingDbContext(DbContextOptions<LeaveTrackingDbContext> options)
         : base(options)
     {
@@ -26,15 +22,13 @@ public partial class LeaveTrackingDbContext : DbContext
 
     public virtual DbSet<MenuTbl> MenuTbls { get; set; }
 
+    public virtual DbSet<NotificationTbl> NotificationTbls { get; set; }
+
     public virtual DbSet<RoleFormPermission> RoleFormPermissions { get; set; }
 
     public virtual DbSet<RoleTbl> RoleTbls { get; set; }
 
     public virtual DbSet<UserTbl> UserTbls { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-L48UG33\\SQLEXPRESS; Database=LeaveTracking;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -143,6 +137,27 @@ public partial class LeaveTrackingDbContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("route");
+        });
+
+        modelBuilder.Entity<NotificationTbl>(entity =>
+        {
+            entity.HasKey(e => e.NotificationId);
+
+            entity.ToTable("Notification_tbl");
+
+            entity.Property(e => e.NotificationId).HasColumnName("Notification_id");
+            entity.Property(e => e.CreatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("created_date");
+            entity.Property(e => e.NotificationType)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Notification_Type");
+            entity.Property(e => e.ReadDate)
+                .HasColumnType("datetime")
+                .HasColumnName("Read_date");
+            entity.Property(e => e.RecevierUserId).HasColumnName("Recevier_user_id");
+            entity.Property(e => e.SenderUserId).HasColumnName("sender_user_id");
         });
 
         modelBuilder.Entity<RoleFormPermission>(entity =>

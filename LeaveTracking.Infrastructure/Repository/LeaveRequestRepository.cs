@@ -18,11 +18,25 @@ namespace LeaveTracking.Infrastructure.Repository
 		{
 			_context = context;
 		}
-		public async Task<bool> AddLeaveRequest(LeaveHistory leaveHistory)
+		public async Task<bool> AddLeaveRequest(LeaveHistory leaveHistory, int loggedInUserId, string username)
 		{
 			try
 			{
 				await _context.LeaveHistories.AddAsync(leaveHistory);
+				await _context.SaveChangesAsync();
+				int? receiver_user_id = await _context.UserTbls.Where(x=>x.UserId==loggedInUserId).Select(x=>x.ManagerId).FirstOrDefaultAsync();
+				string message = $"New leave request from user {username}";
+
+				var notification = new NotificationTbl
+				{
+					Message = message,
+					NotificationType = "LeaveRequest",
+					RecevierUserId = receiver_user_id,
+					SenderUserId = loggedInUserId,
+					IsRead = false,
+					CreatedDate = DateTime.UtcNow
+				};
+				await _context.NotificationTbls.AddAsync(notification);
 				await _context.SaveChangesAsync();
 				return true;
 			}
@@ -55,6 +69,19 @@ namespace LeaveTracking.Infrastructure.Repository
 			catch (Exception ex)
 			{
 				throw new Exception(ex.Message);
+			}
+		}
+
+		public async Task<int> GetUserIdByUsername(string username)
+		{
+			try
+			{
+				var User = await _context.UserTbls.FirstOrDefaultAsync(x => x.UserName == username);
+				return User.UserId;
+			}
+			catch (Exception)
+			{
+				throw;
 			}
 		}
 
