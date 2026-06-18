@@ -78,6 +78,47 @@ namespace LeaveTracking.Controllers
 				return BadRequest(new { success = false, message = "Something Went Wrong" });
 			}
 		}
+		[HttpPost("ForgotPassword")]
+		public async Task<IActionResult> ForgotPassword(string email)
+		{
+			try
+			{
+				var result = await _userService.ForgotPassword(email);
+				if (result)
+				{
+					return Ok(new { success = true, message = "Password reset link sent successfully" });
+				}
+				else
+				{
+					return BadRequest(new { success = false, message = "Email not found" });
+				}
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[HttpPost("Reset-Password")]
+		public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO) 
+		{
+			try
+			{
+				var result = await _userService.ResetPassword(resetPasswordDTO);
+				if(result)
+				{
+					return Ok(new { success = true, message = "Password reset successfully" });
+				}
+				else
+				{
+					return BadRequest(new { success = false, message = "Invalid token or email" });
+				}
+			}
+			catch (Exception)
+			{
+				return BadRequest(new { success = false, message = "Something Went Wrong" });
+			}
+		}
+		[Authorize(Roles = "Admin")]
 		[HttpGet("ManagerList")]
 		public async Task<IActionResult> ManagerList()
 		{
@@ -91,6 +132,7 @@ namespace LeaveTracking.Controllers
 				return BadRequest(new { success = false, message = "Something Went Wrong" });
 			}
 		}
+		[Authorize(Roles = "Admin,Manager")]
 		[HttpPost("LeaveAssignment")]
 		public async Task<IActionResult> Leave_assignment(LeaveBalanceDTO leaveBalance)
 		{
@@ -111,6 +153,7 @@ namespace LeaveTracking.Controllers
 				return BadRequest(new { success = false, message = "Something Went Wrong" });
 			}
 		}
+		[Authorize(Roles = "Admin,Manager")]
 		[HttpGet("GetDeptLeaveAssignments")]
 		public async Task<IActionResult> GetDeptLeaveAssignments()
 		{
@@ -124,6 +167,7 @@ namespace LeaveTracking.Controllers
 				return BadRequest(new { success = false, message = "Something Went Wrong" });
 			}
 		}
+		[Authorize(Roles = "Admin,Manager")]
 		[HttpPost("updateLeave")]
 		public async Task<IActionResult> Update_LeaveAssignment(LeaveBalanceDTO leaveBalance)
 		{

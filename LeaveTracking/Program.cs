@@ -2,6 +2,7 @@ using LeaveTracking.Application.Service;
 using LeaveTracking.Domain.Context;
 using LeaveTracking.Domain.IRepository;
 using LeaveTracking.Infrastructure.Repository;
+using LeaveTracking.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +32,7 @@ builder.Services.AddScoped<MenuService>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<LeaveRequestService>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IEmail, Email>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddAuthentication(x =>
 {

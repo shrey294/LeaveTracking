@@ -206,6 +206,7 @@ public partial class LeaveTrackingDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("Last_Name");
             entity.Property(e => e.ManagerId).HasColumnName("Manager_id");
+            entity.Property(e => e.ResetPasswordExpiry).HasColumnType("datetime");
             entity.Property(e => e.RoleId).HasColumnName("Role_id");
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)

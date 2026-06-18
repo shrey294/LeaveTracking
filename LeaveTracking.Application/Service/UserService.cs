@@ -60,6 +60,19 @@ namespace LeaveTracking.Application.Service
 			string rolename = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
 			return await _userrepo.refresh(DTOMapping, rolename);
 		}
+		public async Task<bool> ForgotPassword(string email)
+		{
+			var emailexisits = await _userrepo.CheckEmailExists(email);
+			if (emailexisits)
+			{
+				return await _userrepo.ForgotPassword(email);
+
+			}
+			else
+			{
+				return false;
+			}
+		}
 		public async Task<List<LeaveTracking.Domain.DTO.ManagerListDTO>> ManagerList()
 		{
 			return await _userrepo.ManagerList();
@@ -91,6 +104,18 @@ namespace LeaveTracking.Application.Service
 				RemainingLeaves = leaveBalance.TotalLeaves
 			};
 			return await _userrepo.Update_LeaveAssignment(mapping);
+		}
+		public async Task<bool> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+		{
+			var result = await _userrepo.CheckEmailExists(resetPasswordDTO.Email);
+			if (result)
+			{
+				return await _userrepo.checkTokenandexpiry(resetPasswordDTO.Email,resetPasswordDTO.EmailToken, resetPasswordDTO.NewPassword);
+			}
+			else
+			{
+				return false;
+			}
 		}
 	}
 }

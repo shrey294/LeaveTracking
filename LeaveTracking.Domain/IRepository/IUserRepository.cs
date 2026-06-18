@@ -18,6 +18,9 @@ namespace LeaveTracking.Domain.IRepository
 		Task<List<DeptLeaveAssignment>> GetDeptLeaveAssignments();
 		Task<LeaveAssignmentResponse> Update_LeaveAssignment(LeaveBalance leaveBalance);
 		Task<int> GetUserIdByUsername(string username);
+		Task<bool> CheckEmailExists(string email);
+		Task<bool> ForgotPassword(string email);
+		Task<bool> checkTokenandexpiry(string email,string token, string passsword);
 
 	}
 }

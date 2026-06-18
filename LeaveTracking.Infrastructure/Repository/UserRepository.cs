@@ -14,15 +14,20 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace LeaveTracking.Infrastructure.Repository
 {
 	public class UserRepository : IUserRepository
 	{
 		private readonly LeaveTrackingDbContext _context;
-		public UserRepository( LeaveTrackingDbContext context)
+		private readonly IConfiguration _configuration;
+		private readonly IEmail _email;
+		public UserRepository( LeaveTrackingDbContext context, IConfiguration configuration, IEmail email)
 		{
 			_context = context;
+			_configuration = configuration;
+			_email = email;
 		}
 
 		public async Task<AuthResponseDTO> Authenticate(UserTbl user)
@@ -355,6 +360,58 @@ namespace LeaveTracking.Infrastructure.Repository
 			try
 			{
 				return _context.UserTbls.Where(x => x.UserName == username).Select(x => x.UserId).FirstOrDefaultAsync();
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task<bool> CheckEmailExists(string email)
+		{
+			try
+			{
+				return await _context.UserTbls.AnyAsync(x => x.Email == email);
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task<bool> ForgotPassword(string email)
+		{
+			try
+			{
+				var user = await _context.UserTbls.FirstOrDefaultAsync(x => x.Email == email);
+				var tokenbytes = RandomNumberGenerator.GetBytes(64);
+				var emailtoken = Convert.ToBase64String(tokenbytes);
+				user.ResetPasswordToken = emailtoken;
+				user.ResetPasswordExpiry = DateTime.Now.AddMinutes(15);
+				string from = _configuration["EmailSettings:From"];
+				var emailmodel = new EmailModel(email, "Reset Password", EmailBody.EmailstringBody(email, emailtoken));
+				_email.SendEmail(emailmodel);
+				await _context.SaveChangesAsync();
+				return true;
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task<bool> checkTokenandexpiry(string email ,string token, string password)
+		{
+			try
+			{
+				var user = await _context.UserTbls.FirstOrDefaultAsync(x => x.Email==email);
+				if (token!=user.ResetPasswordToken || user.ResetPasswordExpiry < DateTime.Now)
+				{
+					return false;
+				}
+				user.Password = PasswordEncrypt.HashPassword(password);
+				await _context.SaveChangesAsync();
+				return true;
 			}
 			catch (Exception)
 			{
