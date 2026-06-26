@@ -14,5 +14,7 @@ namespace LeaveTracking.Domain.IRepository
 		Task<int> GetUserIdByUsernameAsync(string username);
 		Task<bool> AddLeaveRequest(LeaveHistory leaveHistory, int loggedInUserId, string username);
 		Task<int> GetUserIdByUsername(string username);
+		Task<string> GetLeaveTypeNameById(int leaveTypeId);
+		Task<int> GetmanagerId(int userId);
 	}
 }

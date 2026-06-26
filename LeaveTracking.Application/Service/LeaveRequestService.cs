@@ -1,4 +1,5 @@
 ﻿using LeaveTracking.Application.DTO;
+using LeaveTracking.Application.Interfaces;
 using LeaveTracking.Domain.DTO;
 using LeaveTracking.Domain.Entities;
 using LeaveTracking.Domain.IRepository;
@@ -16,10 +17,12 @@ namespace LeaveTracking.Application.Service
 	{
 		private readonly ILeaveRequestRepository _leaveRequestRepository;
 		private readonly IHttpContextAccessor _httpContextAccessor;
-		public LeaveRequestService(ILeaveRequestRepository leaveRequestRepository, IHttpContextAccessor httpContextAccessor)
+		private readonly INotificationPusher _notification;
+		public LeaveRequestService(ILeaveRequestRepository leaveRequestRepository, IHttpContextAccessor httpContextAccessor, INotificationPusher notification)
 		{
 			_leaveRequestRepository = leaveRequestRepository;
 			_httpContextAccessor = httpContextAccessor;
+			_notification = notification;
 		}
 		public async Task<IEnumerable<LeaveRequestDTO>> GetLeaveRequestsAsync()
 		{
@@ -46,7 +49,31 @@ namespace LeaveTracking.Application.Service
 				Reason = leaveHistory.Reason,
 				InsertDate = DateTime.Now,
 			};
-			return await _leaveRequestRepository.AddLeaveRequest(leaveRequest, loggedInUserId, username);
+
+			var result = await _leaveRequestRepository.AddLeaveRequest(leaveRequest, loggedInUserId, username);
+			if (result)
+			{
+				string leavename = await _leaveRequestRepository.GetLeaveTypeNameById(leaveHistory.LeaveTypeId??0);
+				int recevieruserid = await _leaveRequestRepository.GetmanagerId(loggedInUserId);
+
+				var dto = new NotificationDto
+				{
+					Id = 0, // This will be set by the database
+					SenderUserName = username,
+					Message = $"Has Requested for  {leavename}",
+					NotificationType = "LeaveRequest",
+					IsRead = false,
+					CreatedDate = DateTime.Now,
+
+				};
+				await _notification.PushAsync(recevieruserid,dto);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+			//return await _leaveRequestRepository.AddLeaveRequest(leaveRequest, loggedInUserId, username);
 		}
 	}
 }

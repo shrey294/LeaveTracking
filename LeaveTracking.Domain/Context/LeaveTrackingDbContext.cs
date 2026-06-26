@@ -158,6 +158,10 @@ public partial class LeaveTrackingDbContext : DbContext
                 .HasColumnName("Read_date");
             entity.Property(e => e.RecevierUserId).HasColumnName("Recevier_user_id");
             entity.Property(e => e.SenderUserId).HasColumnName("sender_user_id");
+            entity.Property(e => e.SenderUserName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Sender_user_name");
         });
 
         modelBuilder.Entity<RoleFormPermission>(entity =>

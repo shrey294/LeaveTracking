@@ -11,6 +11,8 @@ public partial class NotificationTbl
 
     public int? RecevierUserId { get; set; }
 
+    public string? SenderUserName { get; set; }
+
     public string? Message { get; set; }
 
     public string? NotificationType { get; set; }

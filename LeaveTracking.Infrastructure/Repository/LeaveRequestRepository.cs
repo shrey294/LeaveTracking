@@ -33,6 +33,7 @@ namespace LeaveTracking.Infrastructure.Repository
 					NotificationType = "LeaveRequest",
 					RecevierUserId = receiver_user_id,
 					SenderUserId = loggedInUserId,
+					SenderUserName = username,
 					IsRead = false,
 					CreatedDate = DateTime.UtcNow
 				};
@@ -69,6 +70,39 @@ namespace LeaveTracking.Infrastructure.Repository
 			catch (Exception ex)
 			{
 				throw new Exception(ex.Message);
+			}
+		}
+
+		public Task<string> GetLeaveTypeNameById(int leaveTypeId)
+		{
+			try
+			{
+				var leaveType = _context.LeaveTypes.FirstOrDefault(x => x.LeaveId == leaveTypeId);
+				if (leaveType != null)
+				{
+					return Task.FromResult(leaveType.LeaveName);
+				}
+				else
+				{
+					throw new Exception($"Leave type with ID {leaveTypeId} not found.");
+				}
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+
+		public async Task<int> GetmanagerId(int userId)
+		{
+			try 
+			{
+				int managerId = await _context.UserTbls.Where(x => x.UserId == userId).Select(x => x.ManagerId).FirstOrDefaultAsync()??0;
+				return managerId;
+			}
+			catch (Exception)
+			{
+				throw;
 			}
 		}
 

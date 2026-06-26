@@ -87,7 +87,8 @@ namespace LeaveTracking.Infrastructure.Repository
 			var identity = new ClaimsIdentity(new Claim[]
 			{
 				new Claim(ClaimTypes.Role,rolename),
-				new Claim(ClaimTypes.Name,$"{user.UserName}")
+				new Claim(ClaimTypes.Name,$"{user.UserName}"),
+				new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
 			});
 			var Credentials = new SigningCredentials(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256);
 			var tokendescriptor = new SecurityTokenDescriptor
