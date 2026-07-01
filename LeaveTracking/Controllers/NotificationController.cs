@@ -37,5 +37,48 @@ namespace LeaveTracking.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
 			}
 		}
+		[HttpPost]
+		[Route("MarkAsRead")]
+		public async Task<IActionResult> MarkAsRead([FromBody] int notificationId)
+		{
+			try
+			{
+				
+				var result = await notificationService.MarkAsReadAsync(notificationId);
+				if (result)
+				{
+					return Ok(new {success=true,message="Mark As Read Done"});
+				}
+				else
+				{
+					return NotFound("Notification not found.");
+				}
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+			}
+		}
+		[HttpPost]
+		[Route("markAllRead")]
+		public async Task<IActionResult> markAllRead([FromBody] int Recevier_user_id)
+		{
+			try
+			{
+				var result = await notificationService.markAllRead(Recevier_user_id);
+				if (result)
+				{
+					return Ok(new { success = true, message = "Mark As Read Done" });
+				}
+				else
+				{
+					return NotFound("Notification not found.");
+				}
+			}
+			catch(Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+			}
+		}
 	}
 }

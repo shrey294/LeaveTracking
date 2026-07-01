@@ -19,5 +19,13 @@ namespace LeaveTracking.Application.Service
 		{
 			return await _notificationRepository.GetUnreadAsync(userId);
 		}
+		public async Task<bool> MarkAsReadAsync(int notificationId)
+		{
+			return	await _notificationRepository.MarkAsReadAsync(notificationId);
+		}
+		public async Task<bool> markAllRead(int Recevier_user_id)
+		{
+			return await _notificationRepository.markAllRead(Recevier_user_id);
+		}
 	}
 }
